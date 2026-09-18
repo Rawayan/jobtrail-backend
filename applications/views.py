@@ -15,6 +15,22 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    filterset_fields = [
+        "status",
+        "job_type",
+    ]
+
+    search_fields = [
+        "company",
+        "position",
+    ]
+
+    ordering_fields = [
+        "created_at",
+        "applied_on",
+        "expected_salary",
+    ]
+
     def get_queryset(self):
         return Application.objects.filter(
             owner=self.request.user
