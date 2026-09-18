@@ -1,10 +1,19 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
-from .views import RegisterView
+from .views import ApplicationViewSet, RegisterView
+
+
+router = DefaultRouter()
+router.register(
+    "applications",
+    ApplicationViewSet,
+    basename="application",
+)
 
 
 urlpatterns = [
@@ -15,4 +24,5 @@ urlpatterns = [
         TokenRefreshView.as_view(),
         name="token_refresh",
     ),
+    path("", include(router.urls)),
 ]
