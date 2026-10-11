@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 
+import dj_database_url
+from decouple import Csv, config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,17 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pxu7#vjm8p44mlie33dh-mu!zjymr%to=djnw*rrak(_v9)ml3'
+SECRET_KEY = config("SECRET_KEY", default='django-insecure-pxu7#vjm8p44mlie33dh-mu!zjymr%to=djnw*rrak(_v9)ml3')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = [
-".onrender.com",
-".vercel.app",
-"localhost",
-"127.0.0.1",
-]
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default=".onrender.com,.vercel.app,localhost,127.0.0.1",
+    cast=Csv(),
+)
 
 
 # Application definition
@@ -55,6 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -83,14 +86,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
+# Database — SQLite locally, PostgreSQL (Neon) in production via DATABASE_URL
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=config("DB_SSL_REQUIRE", default=False, cast=bool),
+    )
 }
 
 
@@ -129,6 +133,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 # Email
@@ -159,6 +169,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "https://ayan-jobtrail-frontend.vercel.app",
-]
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="https://ayan-jobtrail-frontend.vercel.app,http://localhost:5173,http://127.0.0.1:5173",
+    cast=Csv(),
+)
