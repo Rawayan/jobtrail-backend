@@ -4,6 +4,10 @@ JobTrail is a job application tracking system that allows users to securely mana
 
 This repository contains the Django REST Framework backend API for the JobTrail application.
 
+
+## Live Link - 
+ - https://jobtrail-frontend-e4dw.vercel.app/
+
 ## Features
 
 * JWT authentication
