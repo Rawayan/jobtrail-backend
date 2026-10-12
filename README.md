@@ -29,7 +29,7 @@ This repository contains the Django REST Framework backend API for the JobTrail 
 * SimpleJWT
 * django-filter
 * django-cors-headers
-* SQLite
+* PostgreSQL
 * python-decouple
 
 ## Project Structure
